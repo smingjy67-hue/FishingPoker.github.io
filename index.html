@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Fishing Poker [v3.2.2] - Optimization & UI Updates</title>
+    <title>Fishing Poker[v3.3.1] - Stable Release</title>
     <style>
-        /* ================= UI 样式保持 v1.9.9 基础 ================= */
+        /* ================= UI 样式保持 ================= */
         :root {
             --bg-gradient: radial-gradient(circle at center, #1a202c 0%, #000000 100%);
             --card-width: 60px;
@@ -27,7 +28,9 @@
             :root { --card-width: 80px; --card-height: 112px; }
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', sans-serif; scrollbar-width: none; }
+        ::-webkit-scrollbar { display: none; }
+        
         body { background: var(--bg-gradient); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         /* Splash Screen */
@@ -94,6 +97,8 @@
         .passive-icon { width: 28px; height: 28px; background: #2d3748; border: 1px solid var(--rare); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: help; color: var(--rare); position: relative; flex-shrink: 0; transition: transform 0.2s; }
         .passive-icon:hover { transform: scale(1.1); box-shadow: 0 0 10px var(--rare); z-index: 10; cursor: pointer; }
 
+        #global-tooltip { position: fixed; background: rgba(0,0,0,0.95); padding: 10px 15px; font-size: 12px; line-height: 1.5; border: 1px solid #666; border-radius: 6px; color: #fff; box-shadow: 0 5px 20px rgba(0,0,0,0.9); z-index: 9999; pointer-events: none; display: none; max-width: 220px; white-space: pre-wrap; transition: opacity 0.2s; }
+        
         .gold-container { display: flex; align-items: center; gap: 10px; }
         .bet-info { font-size: 12px; color: #ff9f43; font-weight: bold; animation: pulse 1s infinite; display: none; }
         .gold-pill { color: var(--gold-color); font-weight: bold; font-size: 16px; background: rgba(255, 215, 0, 0.1); padding: 5px 12px; border-radius: 4px; border: 1px solid rgba(255, 215, 0, 0.3); }
@@ -166,7 +171,7 @@
         .detail-sub { font-size: 12px; color: #888; display: flex; gap: 10px; align-items: center;}
         
         .settle-footer { padding: 15px; background: rgba(0,0,0,0.4); text-align: center; border-top: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-        .tags-container { margin-top: 5px; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 8px; align-items: center; }
+        .tags-container { margin-top: 5px; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 8px; }
         
         .score-tag { background: #333; border: 1px solid #555; padding: 4px 12px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
         .tag-win { background: linear-gradient(90deg, #f1c40f, #f39c12); color: #fff; font-weight: bold; border: none; }
@@ -177,7 +182,6 @@
         
         .info-panel { background: #1a1a1a; border: 1px solid #555; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; color: #ddd; box-shadow: 0 0 30px black; }
         .info-title { color: var(--highlight); margin-bottom: 5px; text-align: center; font-size: 18px; font-weight: bold; }
-        .info-desc { font-size: 12px; color: #888; text-align: center; margin-bottom: 20px; }
         .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333; font-size: 14px; }
         .info-row span { flex: 1; text-align: center; }
         .info-row span:first-child { text-align: left; }
@@ -186,20 +190,27 @@
         .msg-title { font-size: 40px; font-weight: 800; margin-bottom: 20px; color: var(--danger); text-shadow: 0 0 20px rgba(0,0,0,0.8); }
         .msg-subtitle { font-size: 18px; color: #ccc; margin-bottom: 40px; }
         
-        #global-tooltip { position: fixed; background: rgba(0,0,0,0.95); padding: 10px 15px; font-size: 12px; line-height: 1.5; border: 1px solid #666; border-radius: 6px; color: #fff; box-shadow: 0 5px 20px rgba(0,0,0,0.9); z-index: 9999; pointer-events: none; display: none; max-width: 220px; white-space: pre-wrap; }
+        /* Tutorial Screen */
+        #tutorial-screen { background: linear-gradient(135deg, #0f172a 0%, #000000 100%); display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 500; position: fixed; inset: 0; }
+        .tutorial-content { background: rgba(30, 41, 59, 0.95); border: 2px solid var(--gold-color); border-radius: 16px; padding: 30px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,215,0,0.1); position: relative; font-family: 'Georgia', 'Times New Roman', serif; color: #e2e8f0; line-height: 1.8; }
+        .tutorial-content::before { content: '✉'; position: absolute; top: 15px; left: 20px; font-size: 24px; color: var(--gold-color); opacity: 0.5; }
+        .letter-header { font-size: 32px; font-weight: bold; color: var(--gold-color); margin-bottom: 25px; text-align: center; border-bottom: 1px solid rgba(255, 215, 0, 0.2); padding-bottom: 15px; font-family: 'YouYuan', serif; }
+        .letter-body { font-size: 15px; margin-bottom: 30px; text-align: justify; }
+        .letter-body b { color: var(--highlight); }
+        .letter-footer { display: flex; justify-content: center; }
+        .hl-txt { color: var(--highlight); font-weight: bold; }
+        .info-footer { margin-top: 15px; font-size: 14px; color: #aaa; line-height: 1.5; border-top: 1px solid #444; padding-top: 10px; }
 
-        /* Fullscreen Shop & Inventory UI (v3.2.2) */
+        /* Shop/Inventory UI fullscreen */
         #shop-screen { position: fixed; inset: 0; background: var(--bg-gradient); z-index: 450; display: none; flex-direction: row; width: 100%; height: 100%; overflow: hidden; }
         #shop-inv-left { width: 40%; border-right: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); display: flex; flex-direction: column; position: relative; }
         #shop-inv-right { width: 60%; background: rgba(0,0,0,0.2); display: flex; flex-direction: column; }
         
         .shop-tab { padding: 15px 30px; cursor: pointer; color: #aaa; font-weight: bold; transition: 0.3s; }
         .shop-tab.active { color: #fff; background: rgba(255,255,255,0.1); border-bottom: 2px solid var(--highlight); }
-        .pack-card { background: linear-gradient(145deg, #2d3748, #1a202c); border: 2px solid #4a5568; border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; flex: 1; min-width: 140px; }
+        .pack-card { border: 2px solid #4a5568; border-radius: 12px; padding: 20px 15px; text-align: center; cursor: pointer; transition: 0.3s; flex: 1; }
         .pack-card:hover { transform: translateY(-5px); border-color: var(--gold-color); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         
-        /* Removed translation/scaling on hover to avoid misalignment issues on active slots */
-        #equip-circle-wrapper { transition: transform 0.3s ease; transform-origin: center center; }
         .equip-slot { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; border-radius: 50%; background: #1a1a1a; border: 2px dashed #555; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; z-index: 2; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); transform: translate(-50%, -50%); }
         .equip-slot.filled { border-style: solid; border-color: var(--highlight); background: #2d3748; }
         .equip-slot.normal { border-color: var(--rare); }
@@ -210,29 +221,8 @@
         .inv-item:hover { border-color: var(--highlight); box-shadow: 0 0 10px var(--highlight); }
         .inv-item.equipped { border-color: var(--highlight); }
         .inv-item.equipped::after { content: '已装备'; position: absolute; top: 0; right: 0; background: var(--highlight); color: #000; font-size: 9px; padding: 2px 4px; border-radius: 0 8px 0 4px; }
-
-        /* Fullscreen Tutorial Screen (v3.2.2) */
-        #tutorial-screen { position: fixed; inset: 0; background: #000; display: none; justify-content: center; align-items: center; z-index: 500; }
-        #tutorial-screen.visible { display: flex; }
-        .envelope-container { width: 90%; max-width: 800px; padding: 20px; }
-        .letter-modal {
-            position: relative; width: 100%; background: rgba(18, 22, 30, 0.98); border: 2px solid var(--gold-color); border-radius: 4px;
-            padding: 60px 40px 40px; box-shadow: 0 0 50px rgba(0,0,0,0.8); font-family: 'Times New Roman', serif; color: #d1d5db; line-height: 1.8;
-        }
-        .letter-modal::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 80px; background: rgba(255, 215, 0, 0.05);
-            border-bottom: 2px solid var(--gold-color); clip-path: polygon(0 0, 100% 0, 50% 100%); pointer-events: none;
-        }
-        .letter-stamp {
-            position: absolute; top: 15px; right: 25px; width: 50px; height: 60px; background: #a93226; border: 2px dashed #f2d7d5;
-            color: #fff; font-size: 24px; font-family: 'YouYuan', sans-serif; display: flex; align-items: center; justify-content: center;
-            transform: rotate(15deg); box-shadow: 2px 2px 5px rgba(0,0,0,0.5); pointer-events: none;
-        }
-        .letter-header { font-size: 32px; font-weight: bold; color: var(--gold-color); margin-bottom: 25px; text-align: center; padding-bottom: 15px; font-family: 'YouYuan', serif; }
-        .letter-body { font-size: 15px; margin-bottom: 30px; text-align: justify; }
-        .letter-body b { color: var(--highlight); }
-        .letter-footer { display: flex; justify-content: center; }
-        .hl-txt { color: var(--highlight); font-weight: bold; }
+        
+        #info-screen { z-index: 600; }
 
         @media (max-width: 768px) {
             .settle-modal { width: 95%; max-width: 400px; }
@@ -242,29 +232,32 @@
             .win-title-tag, .lose-title-tag { font-size: 18px; padding: 4px 20px; }
             .cards-display-row { transform: scale(0.9); margin: 0; }
             
-            /* v3.2.2 Mobile Card adjustments for harmony */
-            .card-rank { font-size: 1.2em !important; font-weight: normal !important; top: 3px !important; left: 5px !important; }
-            .card-suit { font-size: 1.4em !important; }
-            .card.mini .card-rank { font-size: 0.9em !important; font-weight: normal !important; top: 2px !important; left: 4px !important; }
-            .card.mini .card-suit { font-size: 1.1em !important; }
+            .card-rank { font-size: 1.8em !important; top: 2px !important; left: 4px !important; }
+            .card-suit { font-size: 1.6em !important; }
+            .card.mini .card-rank { font-size: 1.4em !important; top: 2px !important; left: 3px !important; }
+            .card.mini .card-suit { font-size: 1.3em !important; }
             
-            /* v3.2.2 Mobile Shop Responsive */
             #shop-screen { flex-direction: column; }
             #shop-inv-left { width: 100% !important; height: 35vh !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); flex: none; }
             #shop-inv-right { width: 100% !important; height: 65vh !important; flex: 1; }
-            #equip-circle-wrapper { transform: scale(0.65); }
+            
+            .info-footer { font-size: 14px; }
+            
+            .tutorial-content { padding: 20px; width: 95%; }
+            .letter-header { font-size: 24px; margin-bottom: 15px; }
+            .letter-body { font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
         }
 
         @media screen and (max-height: 600px) and (orientation: landscape) {
             :root { --card-width: 40px; --card-height: 56px; --mini-card-width: 32px; --mini-card-height: 44px; }
-            
-            /* v3.2.2 Landscape Card adjustments */
-            .card-rank { font-size: 1.0em !important; font-weight: normal !important; top: 2px !important; left: 4px !important; }
-            .card-suit { font-size: 1.2em !important; top: 55% !important; } 
-            .card.mini .card-rank { font-size: 0.8em !important; font-weight: normal !important; top: 1px !important; left: 3px !important; }
-            .card.mini .card-suit { font-size: 1.0em !important; top: 58% !important; }
+            .card.mini .card-rank { font-size: 1.2em !important; top: 1px !important; left: 2px !important; }
+            .card.mini .card-suit { font-size: 1.2em !important; top: 60% !important; } 
+            .card-rank { font-size: 1.5em !important; top: 1px !important; left: 3px !important; }
+            .card-suit { font-size: 1.5em !important; top: 58% !important; }
             
             .info-panel { width: 90%; max-height: 85vh; overflow-y: auto; font-size: 10px; padding: 10px; }
+            .info-footer { font-size: 10px !important; }
+            
             .lobby-title-main { font-size: 40px; letter-spacing: 2px; }
             .lobby-title-sub { font-size: 20px; margin-bottom: 10px; letter-spacing: 2px; }
             .lobby-orientation { font-size: 12px; margin-bottom: 20px; letter-spacing: 2px; }
@@ -302,9 +295,12 @@
             .msg-title { font-size: 28px; }
             .msg-subtitle { font-size: 14px; margin-bottom: 20px; }
             
+            .tutorial-content { padding: 15px; max-height: 95vh; }
+            .letter-header { font-size: 24px; margin-bottom: 10px; padding-bottom: 5px;}
+            .letter-body { font-size: 12px; margin-bottom: 15px; line-height: 1.6; }
+            
             #shop-inv-left { width: 35% !important; }
             #shop-inv-right { width: 65% !important; }
-            #equip-circle-wrapper { transform: scale(0.65); }
         }
     </style>
 </head>
@@ -318,6 +314,20 @@
     </svg>
     <div class="splash-text">FISHER GAME</div>
 </div>
+
+<div id="toast-msg" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); border: 1px solid var(--highlight); color: #fff; padding: 15px 30px; border-radius: 8px; z-index: 10000; display: none; text-align: center; pointer-events: none; font-size: 16px; box-shadow: 0 5px 25px rgba(0,0,0,0.8);">
+    运气差点哦，没有开出道具！
+</div>
+
+<!-- Modal for Insufficient Gold -->
+<div id="msg-modal" class="overlay" style="z-index: 9999;">
+    <div class="info-panel" style="text-align: center; border-color: var(--danger); width: 80%; max-width: 300px; padding: 30px;">
+        <div style="font-size: 18px; font-weight: bold; color: var(--danger); margin-bottom: 25px;" id="msg-modal-text">当前金币不足</div>
+        <button class="btn btn-primary" style="width: 100px;" onclick="document.getElementById('msg-modal').classList.remove('visible')">确定</button>
+    </div>
+</div>
+
+<div id="global-tooltip" style="position: fixed; pointer-events: none; white-space: pre-wrap;"></div>
 
 <!-- New: Level Map Screen -->
 <div id="map-screen">
@@ -362,7 +372,7 @@
         <div class="lobby-orientation">&lt; 横屏游玩 &gt;</div>
         <button class="btn btn-lobby" onclick="game.enterMapMode()">开始挑战</button>
     </div>
-    <div style="position: absolute; bottom: 20px; right: 20px; color: rgba(255,255,255,0.3); font-family: monospace;">v3.2.2</div>
+    <div style="position: absolute; bottom: 20px; right: 20px; color: rgba(255,255,255,0.3); font-family: monospace;">v3.3.1</div>
 </div>
 
 <header>
@@ -422,7 +432,7 @@
                 <button id="btn-play-hand" class="btn" disabled><span>直接出 5 张手牌</span></button>
             </div>
             <div id="skill-confirm-group" style="display:none; flex-direction:column; gap:5px;">
-                <div id="skill-desc-text" style="font-size:11px; color:var(--rare); text-align:center; margin-bottom:5px;"></div>
+                <div id="skill-desc-text" style="font-size:11px; color:var(--rare); text-align:center; margin-bottom:5px; white-space: pre-wrap;"></div>
                 <button id="btn-skill-ok" class="btn btn-primary" style="background:var(--rare)">确认施法</button>
                 <button id="btn-skill-no" class="btn">取消</button>
             </div>
@@ -441,7 +451,6 @@
 </div>
 
 <div id="overlay-screen" class="overlay"></div>
-<div id="global-tooltip"></div>
 
 <!-- Fullscreen Shop & Inventory UI -->
 <div id="shop-screen">
@@ -457,12 +466,17 @@
     </div>
     <!-- Right: Tabs & Content -->
     <div id="shop-inv-right">
-        <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;">
+        <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; align-items: center;">
             <div id="tab-btn-shop" class="shop-tab active" onclick="game.switchShopTab('shop')">商城</div>
             <div id="tab-btn-inventory" class="shop-tab" onclick="game.switchShopTab('inventory')">背包</div>
-            <div style="margin-left: auto; padding: 15px; color: var(--gold-color); font-weight: bold;">💰 <span id="shop-modal-gold">0</span></div>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 15px; padding-right: 15px;">
+                <div class="icon-btn" onclick="game.toggleInfo()" title="牌型说明" style="width:24px; height:24px; z-index: 500;">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4h2v4zm0-6h-2V7h2v4z"/></svg>
+                </div>
+                <div style="color: var(--gold-color); font-weight: bold;">💰 <span id="shop-modal-gold">0</span></div>
+            </div>
         </div>
-        <div id="tab-content-shop" style="flex: 1; overflow-y: auto; padding: 15px;">
+        <div id="tab-content-shop" style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 15px;">
             <!-- Dynamic Shop Layout -->
         </div>
         <div id="tab-content-inventory" style="flex: 1; overflow-y: auto; padding: 20px; display: none;">
@@ -475,9 +489,9 @@
 </div>
 
 <!-- Floating tooltip for item interaction -->
-<div id="item-interact-bubble" style="display: none; position: absolute; background: rgba(0,0,0,0.95); border: 1px solid var(--gold-color); border-radius: 8px; padding: 15px; z-index: 1000; width: 220px; box-shadow: 0 5px 25px rgba(0,0,0,0.9);">
+<div id="item-interact-bubble" style="display: none; position: fixed; background: rgba(0,0,0,0.95); border: 1px solid var(--gold-color); border-radius: 8px; padding: 15px; z-index: 1000; width: 220px; box-shadow: 0 5px 25px rgba(0,0,0,0.9);">
     <div id="interact-name" style="color: var(--highlight); font-weight: bold; margin-bottom: 5px; font-size: 14px;"></div>
-    <div id="interact-desc" style="color: #ccc; font-size: 12px; margin-bottom: 15px; line-height: 1.4;"></div>
+    <div id="interact-desc" style="color: #ccc; font-size: 12px; margin-bottom: 15px; line-height: 1.4; white-space: pre-wrap;"></div>
     <button id="interact-btn" class="btn btn-primary" style="width: 100%;">装备</button>
 </div>
 
@@ -490,29 +504,36 @@
             同花顺 > 四炸 > 葫芦 > 同花 > 顺子 > 三条 > 两对 > 单牌<br>
             花色大小：黑桃 > 红心 > 方块 > 梅花<br>
             点数大小：A > K > Q > J > 10 > 9 > 8 > 7 > 6 > 5 > 4 > 3 > 2
-            <br><span style="color:var(--gold-color)">每局获得金币：为本局牌型对应积分的 10%</span>
+            <br><span style="color:var(--gold-color)">每局获得积分：为本局牌型对应积分的 10%</span>
         </div>
     </div>
 </div>
 
-<!-- Tutorial Fullscreen Page -->
+<!-- Tutorial Screen -->
 <div id="tutorial-screen">
-    <div class="envelope-container">
-        <div class="letter-modal">
-            <div class="letter-stamp">狐</div>
-            <div class="letter-header">新手引导！</div>
-            <div class="letter-body">
-                冒险者：<br>
-                欢迎来到狐狸岛，这里充满了机遇，也处处是危险，不要太相信眼前的事物。想要拿到徽章？无尽塔楼就在前方，你去便是！但要注意，留心观察每一层挑战目标，别大意！<br>
-                <b class="hl-txt">【关卡目标】</b>是通关的重点，在顶部栏左侧可以查看。<br>
-                <b class="hl-txt">【游戏规则】</b>每人 7 张手牌，放 2 张诱饵牌，接着手中的 5 张手牌可以拿出 3 张与双方放置的 2 张诱饵牌进行组合成最终的 5 张牌，也可以直接出手中的 5 张牌；<br>
-                <b class="hl-txt">【对局说明】</b>牌型分为同花顺>四炸>葫芦>同花>顺子>三条>两对>单牌 ；不同牌型获得的积分也不同，可以在牌型说明中看到；<br>
-                <b class="hl-txt">【游玩技巧】</b>关卡中支持使用道具技能，帮助你顺利通关！<br>
-                祝你好运！若能顺利登上无尽塔楼8 层，你会再看到我的，【狐狸徽章】就在那！
-            </div>
-            <div class="letter-footer">
-                <button class="btn btn-primary" style="width:200px; padding:15px; font-size: 16px;" onclick="game.closeTutorial()">收下信件</button>
-            </div>
+    <div class="waves-container" style="z-index: 0; opacity: 0.1;">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs> <path id="gentle-wave-tut" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /> </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave-tut" x="48" y="0" />
+                <use xlink:href="#gentle-wave-tut" x="48" y="3" />
+                <use xlink:href="#gentle-wave-tut" x="48" y="5" />
+            </g>
+        </svg>
+    </div>
+    <div class="tutorial-content" style="z-index: 10;">
+        <div class="letter-header">新手引导！</div>
+        <div class="letter-body">
+            冒险者：<br>
+            欢迎来到狐狸岛，这里充满了机遇，也处处是危险，不要太相信眼前的事物。想要拿到徽章？无尽塔楼就在前方，你去便是！但要注意，留心观察每一层挑战目标，别大意！<br><br>
+            <b class="hl-txt">【关卡目标】</b>是通关的重点，在顶部栏左侧可以查看。<br><br>
+            <b class="hl-txt">【游戏规则】</b>每人 7 张手牌，放 2 张诱饵牌，接着手中的 5 张手牌可以拿出 3 张与双方放置的 2 张诱饵牌进行组合成最终的 5 张牌，也可以直接出手中的 5 张牌；<br><br>
+            <b class="hl-txt">【对局说明】</b>牌型分为同花顺 > 四炸 > 葫芦 > 同花 > 顺子 > 三条 > 两对 > 单牌 ；不同牌型获得的积分也不同，可以在牌型说明中看到；<br><br>
+            <b class="hl-txt">【游玩技巧】</b>关卡中支持使用道具技能，帮助你顺利通关！<br><br>
+            祝你好运！若能顺利登上无尽塔楼 8 层，你会再看到我的，【狐狸徽章】就在那！
+        </div>
+        <div class="letter-footer">
+            <button class="btn btn-primary" style="width:200px; padding:15px;" onclick="game.closeTutorial()">开始挑战</button>
         </div>
     </div>
 </div>
@@ -588,7 +609,7 @@ const OPPONENT_PERSONAS = {
 const SKILLS_DB = {
     xuanji: { name: '玄机', icon: '🌀', desc: '选择 1～5 张牌弃掉重抽', type: 'round_limit', maxUses: 3 },
     yundu: { name: '云渡', icon: '☁️', desc: '选择 1 张牌与对方手牌随机交换', type: 'consumable' },
-    huanzhu: { name: '幻注', icon: '💸', desc: '选择比例下注（仅-2关卡可用）', type: 'once_per_round' },
+    huanzhu: { name: '幻注', icon: '💸', desc: '选择比例下注（仅-2关卡可用）', extDesc: '选择比例下注（仅-2关卡可用）\n下注说明：\n（1）回合胜利：已下注金额返还，并获得等额积分奖励\n（2）回合失败：已下注金额将全部扣除', type: 'once_per_round' },
     xinjing: { name: '心镜', icon: '🔮', desc: '提前查看对方诱饵牌', type: 'consumable' },
     abyss: { name: '深渊之眼', icon: '👁️', desc: '查看对方手牌', type: 'consumable' },
     mirror: { name: '镜界', icon: '🪞', desc: '复制对方手牌', type: 'consumable' },
@@ -607,7 +628,7 @@ const REWARD_POOL =[
     { id: 'tianlv', weight: 60, name: '天律', desc: '结算时牌型为同花顺，获得道具加倍积分，牌型积分x5', type: 'passive', icon: '📜', trigger:'同花顺', mult:4, price: 30, unique: true },
     
     // Skill items available in shop
-    { id: 'yundu', weight: 20, name: '云渡', desc: '选择 1 张牌与对方手牌随机交换', type: 'item_active', ref: 'yundu', unique: false, icon: '☁️', price: 200 },
+    { id: 'yundu', weight: 20, name: '云渡', desc: '选择 1 张牌与对方手牌随机交换', type: 'item_active', ref: 'yundu', unique: false, icon: '☁️', price: 50 },
     { id: 'huanzhu', weight: 20, name: '幻注', desc: '选择比例下注（仅-2关卡可用）', type: 'item_active', ref: 'huanzhu', unique: true, icon: '💸', price: 200 },
     { id: 'xinjing', weight: 20, name: '心镜', desc: '提前查看对方诱饵牌', type: 'item_active', ref: 'xinjing', unique: false, icon: '🔮', price: 50 },
     { id: 'abyss', weight: 20, name: '深渊之眼', desc: '查看对方手牌', type: 'item_active', ref: 'abyss', unique: false, icon: '👁️', price: 50 },
@@ -618,12 +639,41 @@ const REWARD_POOL =[
     { id: 'xuanshu', weight: 10, name: '玄枢', desc: '【玄机】使用次数+1', type: 'upgrade', icon: '🆙', effect: 'add_xuanji', getPrice: (game) => game.upgradeCounts.xuanshu ? 100 : 50 },
     { id: 'huance', weight: 10, name: '幻策', desc: '【幻注】下注比例+10%', type: 'upgrade', icon: '💹', effect: 'boost_bet', getPrice: (game) => game.upgradeCounts.huance ? 100 : 50 },
     { id: 'xinyu', weight: 5, name: '心屿', desc: '技能槽位数+1', type: 'upgrade', icon: '🧩', effect: 'add_slot', getPrice: (game) => game.upgradeCounts.xinyu ? 100 : 50 },
+    { id: 'xunang', weight: 5, name: '虚囊', desc: '普通道具槽位数+1', type: 'upgrade', icon: '👝', effect: 'add_passive_slot', getPrice: (game) => ((game.upgradeCounts.xunang || 0) + 1) * 200 },
     
+    // Hand Upgrades
+    { id: 'fumo', weight: 10, name: '浮沫', desc: '单牌：牌型积分+60', type: 'upgrade', icon: '🫧', getPrice: (game) => ((game.upgradeCounts.fumo || 0) + 1) * 10 },
+    { id: 'shuangli', weight: 10, name: '双鲤', desc: '对子：牌型积分+60', type: 'upgrade', icon: '🎏', getPrice: (game) => ((game.upgradeCounts.shuangli || 0) + 1) * 10 },
+    { id: 'jinwei', weight: 10, name: '锦尾', desc: '两对：牌型积分+60', type: 'upgrade', icon: '🐠', getPrice: (game) => ((game.upgradeCounts.jinwei || 0) + 1) * 10 },
+    { id: 'yuezhu', weight: 10, name: '跃珠', desc: '三条：牌型积分+100', type: 'upgrade', icon: '🔮', getPrice: (game) => ((game.upgradeCounts.yuezhu || 0) + 1) * 10 },
+    { id: 'yousuo', weight: 10, name: '游梭', desc: '顺子：牌型积分+100', type: 'upgrade', icon: '🛶', getPrice: (game) => ((game.upgradeCounts.yousuo || 0) + 1) * 10 },
+    { id: 'yixi', weight: 10, name: '一汐', desc: '同花：牌型积分+100', type: 'upgrade', icon: '🌊', getPrice: (game) => ((game.upgradeCounts.yixi || 0) + 1) * 10 },
+    { id: 'cangjiao', weight: 10, name: '藏鲛', desc: '葫芦：牌型积分+100', type: 'upgrade', icon: '🧜', getPrice: (game) => ((game.upgradeCounts.cangjiao || 0) + 1) * 10 },
+    { id: 'baochao', weight: 10, name: '爆潮', desc: '四炸：牌型积分+150', type: 'upgrade', icon: '💥', getPrice: (game) => ((game.upgradeCounts.baochao || 0) + 1) * 10 },
+    { id: 'longyuan', weight: 10, name: '龙渊', desc: '同花顺：牌型积分+200', type: 'upgrade', icon: '🐉', getPrice: (game) => ((game.upgradeCounts.longyuan || 0) + 1) * 10 },
+
     // Dynamic Passives
     { id: 'yangyao', weight: 20, name: '阳爻', desc: '结算时牌型包含奇数 （1、3、5、7、9），获得牌型积分 x每1张牌数', type: 'passive', icon: '🔆', trigger: 'odd', unique: true, price: 100 },
     { id: 'yinyao', weight: 20, name: '阴爻', desc: '结算时牌型包含偶数（2、4、6、8、10），获得牌型积分 x每1张牌数', type: 'passive', icon: '🌑', trigger: 'even', unique: true, price: 100 },
     { id: 'qishi', weight: 20, name: '骑士', desc: '结算时牌型包含人头牌（J、Q、K)，每 1 张可获得牌型积分 x10', type: 'passive', icon: '🛡️', trigger: 'face', unique: true, price: 50 },
-    { id: 'fishhook', weight: 20, name: '黄金鱼钩', desc: '钓鱼成功，倍数+1', type: 'passive', icon: '🪝', trigger: 'fishhook', unique: true, price: 50 }
+    { id: 'fishhook', weight: 20, name: '黄金鱼钩', desc: '钓鱼成功，倍数+1', type: 'passive', icon: '🪝', trigger: 'fishhook', unique: true, price: 50 },
+    { id: 'haixing', weight: 20, name: '海星', desc: '结算时牌型包含"红桃 A"，额外获得 200 金币', type: 'passive', icon: '⭐', trigger: 'haixing', unique: true, price: 50 },
+    { id: 'hailuo', weight: 20, name: '海螺', desc: '结算时牌型包含"梅花"花色，有 1/2概率获得 1000 积分', type: 'passive', icon: '🐚', trigger: 'hailuo', unique: true, price: 100 },
+    { id: 'shanhu', weight: 20, name: '珊瑚', desc: '结算时牌型包含“黑桃”花色，有 1/3概率获得 200 金币', type: 'passive', icon: '🪸', trigger: 'shanhu', unique: true, price: 100 },
+    { id: 'jiangliu', weight: 20, name: '江流', desc: '结算时获得 50 金币，此后每次多加 50金币', type: 'passive', icon: '🌊', trigger: 'jiangliu', unique: true, price: 100 },
+    { id: 'langhua', weight: 20, name: '浪花', desc: '结算时牌型包含"红桃 6、红桃 8"，额外获得 500 金币', type: 'passive', icon: '💦', trigger: 'langhua', unique: true, price: 100 },
+    { id: 'paomo', weight: 20, name: '泡沫', desc: '商城所有物品 5 折出售', type: 'passive', icon: '🫧', trigger: 'paomo', unique: true, price: 200 },
+    { id: 'chaoxi', weight: 20, name: '潮汐', desc: '每回合结束有 1/2 概率获得 1000 积分', type: 'passive', icon: '🌙', trigger: 'chaoxi', unique: true, price: 100 },
+    { id: 'fuping', weight: 20, name: '浮萍', desc: '每回合结束获得 100 金币', type: 'passive', icon: '🍃', trigger: 'fuping', unique: true, price: 100 },
+    { id: 'xuanwo', weight: 20, name: '漩涡', desc: '【幻注】下注比例各提升 10%', type: 'passive', icon: '🌀', trigger: 'xuanwo', unique: true, price: 100 },
+    { id: 'jiaoshi', weight: 20, name: '礁石', desc: '结算时获得 200 积分，此后每次多加 100积分', type: 'passive', icon: '🪨', trigger: 'jiaoshi', unique: true, price: 100 },
+    { id: 'haikui', weight: 20, name: '海葵', desc: '每回合+1 张手牌，玄机使用次数-1', type: 'passive', icon: '🪼', trigger: 'haikui', unique: true, price: 100 },
+    { id: 'zhenzhu', weight: 20, name: '珍珠', desc: '打出的钓饵牌为对子，胜利结算时+100 金币', type: 'passive', icon: '⚪', trigger: 'zhenzhu', unique: true, price: 100 },
+    { id: 'shali', weight: 20, name: '沙粒', desc: '每次通关在商城中获得 1 张随机免费的升级牌', type: 'passive', icon: '⏳', trigger: 'shali', unique: true, price: 100 },
+    { id: 'yuqun', weight: 20, name: '鱼群', desc: '结算时额外获得牌型的数字总和 x50 的积分奖励', type: 'passive', icon: '🐟', trigger: 'yuqun', unique: true, price: 100 },
+    { id: 'riyao', weight: 20, name: '日爻', desc: '结算时牌型包含奇数 （1、3、5、7、9），获得牌型积分 x5', type: 'passive', icon: '🌞', trigger: 'odd_5x', unique: true, price: 50 },
+    { id: 'yueyao', weight: 20, name: '月爻', desc: '结算时牌型包含偶数（2、4、6、8、10），获得牌型积分 x5', type: 'passive', icon: '🌜', trigger: 'even_5x', unique: true, price: 50 },
+    { id: 'zhanma', weight: 20, name: '战马', desc: '结算时牌型包含人头牌（J、Q、K)，获得牌型积分 x5', type: 'passive', icon: '🐎', trigger: 'face_5x', unique: true, price: 50 }
 ];
 
 const HAND_TYPES_BASE =[
@@ -699,8 +749,11 @@ class Game {
         this.skillUsage = {}; 
         this.skillMaxModifiers = { xuanji: 0 }; 
         this.obtainedItems =[]; 
-        this.upgradeCounts = { xuanshu: 0, huance: 0, xinyu: 0 }; 
+        this.upgradeCounts = {}; 
         
+        this.jiangliuCount = 0;
+        this.jiaoshiCount = 0;
+
         this.betUsedThisRound = false; 
         this.betRatios =[0.3, 0.5]; 
         this.maxSkillSlots = 3; 
@@ -712,7 +765,7 @@ class Game {
         this.availablePacks =[];
     }
     
-    shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] =[array[j], array[i]]; } }
+    shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] =[array[j], array[i]]; } }
 
     showLobby() { this.audio.init(); if(this.isAudioOn) this.audio.start(); }
     
@@ -773,7 +826,7 @@ class Game {
 
         if (!this.tutorialShown) {
              this.setOverlayState(true);
-             document.getElementById('tutorial-screen').classList.add('visible');
+             document.getElementById('tutorial-screen').style.display = 'flex';
         }
     }
     
@@ -796,9 +849,32 @@ class Game {
     }
     
     closeTutorial() {
-        document.getElementById('tutorial-screen').classList.remove('visible');
+        document.getElementById('tutorial-screen').style.display = 'none';
         this.setOverlayState(false);
         this.tutorialShown = true;
+    }
+
+    getDynamicDesc(id, type, isTooltip = false) {
+        if (type === 'skill') {
+            let s = SKILLS_DB[id];
+            if (!s) return '';
+            if (id === 'huanzhu' && isTooltip && s.extDesc) return s.extDesc;
+            return s.desc;
+        } else {
+            let p = REWARD_POOL.find(x => x.id === id);
+            if (!p) return '';
+            let desc = p.desc;
+            if (id === 'jiangliu') {
+                let n = 50 + (this.jiangliuCount || 0) * 50;
+                desc += ` 本回合可得${n}`;
+            } else if (id === 'jiaoshi') {
+                let n = 200 + (this.jiaoshiCount || 0) * 100;
+                desc += ` 本回合可得${n}`;
+            } else if (p.ref === 'huanzhu' && isTooltip && SKILLS_DB.huanzhu.extDesc) {
+                desc = SKILLS_DB.huanzhu.extDesc;
+            }
+            return desc;
+        }
     }
 
     initDOM() { 
@@ -812,7 +888,7 @@ class Game {
         const tooltip = document.getElementById('global-tooltip'); 
         
         document.body.addEventListener('mouseover', (e) => { 
-            const target = e.target.closest('.passive-icon'); 
+            const target = e.target.closest('.passive-icon') || e.target.closest('.skill-item'); 
             if(target) { 
                 const desc = target.getAttribute('data-desc'); 
                 if(desc) { 
@@ -820,23 +896,54 @@ class Game {
                     tooltip.style.display = 'block'; 
                     const rect = target.getBoundingClientRect(); 
                     
-                    let finalX = rect.left + 10;
-                    let finalY = rect.bottom + 10;
+                    let isTop = target.closest('header');
                     
-                    if (finalX + 240 > window.innerWidth) {
-                        finalX = window.innerWidth - 250;
-                    }
-                    if (finalY + tooltip.offsetHeight > window.innerHeight) {
-                        finalY = rect.top - tooltip.offsetHeight - 10;
+                    if(target.closest('#skill-dock') || target.classList.contains('skill-item')) {
+                         tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px'; 
+                    } else if (isTop) {
+                         tooltip.style.top = (rect.bottom + 10) + 'px'; 
+                    } else {
+                         tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px'; 
                     }
                     
-                    tooltip.style.left = Math.max(10, finalX) + 'px'; 
-                    tooltip.style.top = finalY + 'px'; 
+                    let finalX = rect.left + rect.width/2 - tooltip.offsetWidth/2;
+                    if (finalX < 10) finalX = 10;
+                    if (finalX + tooltip.offsetWidth > window.innerWidth - 10) finalX = window.innerWidth - tooltip.offsetWidth - 10;
+                    
+                    tooltip.style.left = finalX + 'px'; 
                 } 
             } 
         }); 
         document.body.addEventListener('mouseout', (e) => { 
-            if(e.target.closest('.passive-icon')) tooltip.style.display = 'none'; 
+            if(e.target.closest('.passive-icon') || e.target.closest('.skill-item')) tooltip.style.display = 'none'; 
+        }); 
+        document.body.addEventListener('click', (e) => { 
+            const target = e.target.closest('.passive-icon') || e.target.closest('.skill-item'); 
+            if(target) { 
+                const desc = target.getAttribute('data-desc'); 
+                if(desc) { 
+                    tooltip.innerText = desc; 
+                    tooltip.style.display = 'block'; 
+                    const rect = target.getBoundingClientRect(); 
+                    
+                    let isTop = target.closest('header');
+                    
+                    if(target.closest('#skill-dock') || target.classList.contains('skill-item')) {
+                         tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px'; 
+                    } else if (isTop) {
+                         tooltip.style.top = (rect.bottom + 10) + 'px'; 
+                    } else {
+                         tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px'; 
+                    }
+                    
+                    let finalX = rect.left + rect.width/2 - tooltip.offsetWidth/2;
+                    if (finalX < 10) finalX = 10;
+                    if (finalX + tooltip.offsetWidth > window.innerWidth - 10) finalX = window.innerWidth - tooltip.offsetWidth - 10;
+                    
+                    tooltip.style.left = finalX + 'px'; 
+                    setTimeout(() => tooltip.style.display = 'none', 3000); 
+                } 
+            } 
         }); 
 
         document.addEventListener('click', (e) => {
@@ -913,7 +1020,9 @@ class Game {
             return c; 
         };
 
-        this.playerHand = draw(7).sort((a,b)=>b.value - a.value);
+        let handSize = 7;
+        if (this.equippedPassives.includes('haikui')) handSize = 8;
+        this.playerHand = draw(handSize).sort((a,b)=>b.value - a.value);
         
         let aiHand =[];
         const isNerfLevel = (this.config.floor <= 2 && this.config.step === 1);
@@ -942,7 +1051,9 @@ class Game {
             const s = SKILLS_DB[k]; 
             if(s && s.type === 'round_limit') {
                 let bonus = this.skillMaxModifiers[k] || 0;
-                this.skillUsage[k] = s.maxUses + bonus;
+                let usage = s.maxUses + bonus;
+                if (k === 'xuanji' && this.equippedPassives.includes('haikui')) usage -= 1;
+                this.skillUsage[k] = usage;
             }
         });
         
@@ -950,20 +1061,31 @@ class Game {
         this.updateHeader(); this.renderScene(); this.updateControls();
     }
 
-    evalHandValue(cards) {
-        const isWild = (this.config.rule === 'wild_6'); const res = PokerEngine.evaluate(cards, isWild);
+    evalHandValue(cards, isWild, isFinalSettle = false) {
+        const res = PokerEngine.evaluate(cards, isWild);
         
         let base = res.base; 
         let typeBonus = 0;   
         let itemBonus = 0;   
         let mult = 0;        
         let triggeredItems =[];
+        let bonusGold = 0;
+        
+        const upgradeMap = {
+            '单牌': {id: 'fumo', val: 60}, '对子': {id: 'shuangli', val: 60}, '两对': {id: 'jinwei', val: 60},
+            '三条': {id: 'yuezhu', val: 100}, '顺子': {id: 'yousuo', val: 100}, '同花': {id: 'yixi', val: 100},
+            '葫芦': {id: 'cangjiao', val: 100}, '四炸': {id: 'baochao', val: 150}, '同花顺': {id: 'longyuan', val: 200}
+        };
+        if (upgradeMap[res.name] && this.upgradeCounts[upgradeMap[res.name].id]) {
+            base += this.upgradeCounts[upgradeMap[res.name].id] * upgradeMap[res.name].val;
+        }
 
         this.equippedPassives.forEach(pId => { 
             const p = REWARD_POOL.find(x => x.id === pId);
             if(!p) return;
 
             let triggered = false;
+            
             if (['guchen','shuangying','sixiang','sanyuan','lianchao','yise','fulu','siji','tianlv', 'chaodie', 'xingcu', 'liuxu', 'zhanyi', 'xuanhe', 'jiyao', 'minglv'].includes(p.id)) {
                  if(p.trigger === res.name) { 
                      if (p.val) typeBonus += p.val; 
@@ -983,9 +1105,72 @@ class Game {
                  const count = cards.filter(c=>['J','Q','K'].includes(c.rank)).length;
                  if(count > 0) { itemBonus += (base * 10 * count); triggered=true; }
             }
+            else if (p.id === 'riyao') {
+                 const count = cards.filter(c=>['A','3','5','7','9'].includes(c.rank)).length;
+                 if(count > 0) { itemBonus += (base * 5); triggered=true; }
+            } 
+            else if (p.id === 'yueyao') {
+                 const count = cards.filter(c=>['2','4','6','8','10'].includes(c.rank)).length;
+                 if(count > 0) { itemBonus += (base * 5); triggered=true; }
+            }
+            else if (p.id === 'zhanma') {
+                 const count = cards.filter(c=>['J','Q','K'].includes(c.rank)).length;
+                 if(count > 0) { itemBonus += (base * 5); triggered=true; }
+            }
             else if (p.trigger === 'face') { 
                  const count = cards.filter(c =>['J','Q','K'].includes(c.rank)).length;
                  if(count > 0) { mult += (p.mult * count); triggered=true; }
+            }
+            else if (p.id === 'haixing' && cards.some(c => c.suit === '♥' && c.rank === 'A')) { 
+                 if (isFinalSettle) bonusGold += 200; 
+                 triggered = true; 
+            }
+            else if (p.id === 'hailuo' && cards.some(c => c.suit === '♣')) {
+                 if (isFinalSettle) {
+                     if (Math.random() < 0.5) { itemBonus += 1000; triggered = true; }
+                 } else { triggered = true; }
+            }
+            else if (p.id === 'shanhu' && cards.some(c => c.suit === '♠')) {
+                 if (isFinalSettle) {
+                     if (Math.random() < 0.333) { bonusGold += 200; triggered = true; }
+                 } else { triggered = true; }
+            }
+            else if (p.id === 'jiangliu') { 
+                 if (isFinalSettle) bonusGold += 50 + (this.jiangliuCount || 0) * 50; 
+                 triggered = true; 
+            }
+            else if (p.id === 'langhua' && cards.some(c => c.suit === '♥' && c.rank === '6') && cards.some(c => c.suit === '♥' && c.rank === '8')) { 
+                 if (isFinalSettle) bonusGold += 500; 
+                 triggered = true; 
+            }
+            else if (p.id === 'chaoxi') {
+                 if (isFinalSettle) {
+                     if (Math.random() < 0.5) { itemBonus += 1000; triggered = true; }
+                 } else { triggered = true; }
+            }
+            else if (p.id === 'fuping') { 
+                 if (isFinalSettle) bonusGold += 100; 
+                 triggered = true; 
+            }
+            else if (p.id === 'jiaoshi') { 
+                 itemBonus += 200 + (this.jiaoshiCount || 0) * 100; 
+                 triggered = true; 
+            }
+            else if (p.id === 'zhenzhu') {
+                 if (this.playerBait && this.playerBait.length === 2 && this.playerBait[0].rank === this.playerBait[1].rank) {
+                     if (isFinalSettle) bonusGold += 100; 
+                     triggered = true; 
+                 }
+            }
+            else if (p.id === 'yuqun') {
+                 let sum = 0;
+                 cards.forEach(c => {
+                     let v = parseInt(c.rank) || 10;
+                     if (c.rank === 'A') v = 10;
+                     sum += v;
+                 });
+                 itemBonus += sum * 50;
+                 triggered = true;
             }
 
             if(triggered && !triggeredItems.includes(p.name)) triggeredItems.push(p.name);
@@ -995,7 +1180,7 @@ class Game {
         let total = (row1_val + itemBonus) * (1 + mult);
         let row2_val = total - row1_val;
 
-        return { ...res, payout: total, row1: row1_val, row2: row2_val, items: triggeredItems };
+        return { ...res, payout: total, row1: row1_val, row2: row2_val, items: triggeredItems, bonusGold: bonusGold };
     }
 
     renderScene() {
@@ -1052,10 +1237,13 @@ class Game {
             if(k === 'xinjing' && this.oppBait.length > 0 && this.oppBait[0].revealed) dis = true;
             if(k === 'xinjing' && this.phase !== 'BAIT') dis = true;
 
-            if(dis) el.classList.add('disabled'); el.setAttribute('data-desc', dis&&k==='huanzhu'&&this.betUsedThisRound ? "本回合已使用" : s.desc);
+            if(dis) el.classList.add('disabled'); 
+            el.setAttribute('data-desc', `${s.name}: ${this.getDynamicDesc(k, 'skill', true)}`);
+            
             const icon = s.icon || '🔰';
             el.innerHTML = `<div style="font-size:20px">${icon}</div><div style="font-size:10px">${s.name}</div>${count!==''?`<div class="skill-count">${count}</div>`:''}`;
             el.onclick = () => { if(!dis) this.activateSkill(k); }
+            
             div.appendChild(el);
         });
     }
@@ -1065,11 +1253,16 @@ class Game {
         bait.style.display='none'; play.style.display='none'; skill.style.display='none'; bet.style.display='none';
         if(this.skillMode) {
             if(this.skillMode==='huanzhu') {
-                document.querySelector('#bet-panel button:nth-child(2)').innerText = `下注 ${(this.betRatios[0]*100)}%`; document.querySelector('#bet-panel button:nth-child(2)').onclick = () => game.placeBet(0);
-                document.querySelector('#bet-panel button:nth-child(3)').innerText = `下注 ${(this.betRatios[1]*100)}%`; document.querySelector('#bet-panel button:nth-child(3)').onclick = () => game.placeBet(1);
+                let r1 = this.betRatios[0];
+                let r2 = this.betRatios[1];
+                if (this.equippedPassives.includes('xuanwo')) {
+                    r1 += 0.1; r2 += 0.1;
+                }
+                document.querySelector('#bet-panel button:nth-child(2)').innerText = `下注 ${(r1*100).toFixed(0)}%`; document.querySelector('#bet-panel button:nth-child(2)').onclick = () => game.placeBet(0);
+                document.querySelector('#bet-panel button:nth-child(3)').innerText = `下注 ${(r2*100).toFixed(0)}%`; document.querySelector('#bet-panel button:nth-child(3)').onclick = () => game.placeBet(1);
                 bet.style.display='flex'; return; 
             }
-            skill.style.display='flex'; document.getElementById('skill-desc-text').innerText = SKILLS_DB[this.skillMode].desc;
+            skill.style.display='flex'; document.getElementById('skill-desc-text').innerText = this.getDynamicDesc(this.skillMode, 'skill', false);
             const ok = document.getElementById('btn-skill-ok');
             if(['yundu','blast'].includes(this.skillMode)) ok.disabled = this.selectedCards.length!==1; else if(this.skillMode==='xuanji') ok.disabled = this.selectedCards.length===0; else ok.disabled = false;
             return;
@@ -1125,39 +1318,43 @@ class Game {
     playRound(type) {
         let cards =[], baitSrc = 'none';
         if(type==='opp') { cards =[...this.selectedCards, ...this.oppBait]; baitSrc='opp'; } else if(type==='mine') { cards=[...this.selectedCards, ...this.playerBait]; baitSrc='mine'; } else cards=[...this.selectedCards];
-        const isWild = (this.config.rule === 'wild_6'); const myRes = this.evalHandValue(cards); 
+        const isWild = (this.config.rule === 'wild_6'); const myResPreview = this.evalHandValue(cards, isWild); 
         const aiBestMine = PokerEngine.getBestCombo(this.oppHand, this.playerBait, isWild); const aiBestOpp  = PokerEngine.getBestCombo(this.oppHand, this.oppBait, isWild); const aiDirect = PokerEngine.evaluate(this.oppHand, isWild); 
         const aiOpts =[{ t:'mine', ...aiBestMine }, { t:'opp', ...aiBestOpp }, { t:'none', ...aiDirect }]; aiOpts.sort((a,b)=>b.rawScore - a.rawScore); const aiRes = aiOpts[0];
-        const win = myRes.rawScore > aiRes.rawScore; let fish = false;
+        
+        const win = myResPreview.rawScore > aiRes.rawScore; let fish = false;
         
         let finalPayout = 0;
+        let myRes = myResPreview;
 
         if(win) {
+            myRes = this.evalHandValue(cards, isWild, true); 
             this.currentLevelWins++; 
             fish = (baitSrc==='mine' && aiRes.t==='mine');
-            let totalHandVal = myRes.payout;
             
-            let fishMult = 2;
-            if (this.equippedPassives.includes('fishhook')) fishMult = 3;
-            if (fish) totalHandVal *= fishMult; 
+            let fishMultBase = this.equippedPassives.includes('fishhook') ? 3 : 2;
+            let checkReward = myRes.payout * (fish ? fishMultBase : 1);
 
             let betRefund = 0;
-            let betProfit = 0;
+            let betPointsProfit = 0;
             if (this.currentBet > 0) {
                 betRefund = this.currentBet;
-                betProfit = this.currentBet; 
+                betPointsProfit = this.currentBet; 
             }
 
-            finalPayout = Math.floor(totalHandVal * 0.10) + betRefund + betProfit;
+            checkReward += betPointsProfit;
+            this.levelEarnedGold += checkReward; 
+
+            finalPayout = Math.floor((checkReward - betPointsProfit) * 0.10) + betRefund + (myRes.bonusGold || 0);
+            
+            if (this.equippedPassives.includes('jiangliu')) this.jiangliuCount = (this.jiangliuCount || 0) + 1;
+            if (this.equippedPassives.includes('jiaoshi')) this.jiaoshiCount = (this.jiaoshiCount || 0) + 1;
         } else {
             this.currentLevelLosses++; 
-            if(this.currentBet > 0) this.currentTargetGold += this.currentBet;
         }
 
         let fishMultBase = this.equippedPassives.includes('fishhook') ? 3 : 2;
-        let checkReward = (win ? (myRes.payout * (fish ? fishMultBase : 1)) : 0); 
-
-        this.levelEarnedGold += checkReward; 
+        let checkRewardForVisual = (win ? (myRes.payout * (fish ? fishMultBase : 1) + (this.currentBet > 0 ? this.currentBet : 0)) : 0); 
         
         this.playerGold += finalPayout; 
         this.updateHeader();
@@ -1179,25 +1376,25 @@ class Game {
         }
 
         if(this.config.target === 'accumulate') {
-            if(pass) this.showSettlePanel(true, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, true, "", checkReward);
-            else if(this.currentRound < 3) this.showSettlePanel(win, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, false, "", checkReward);
-            else this.showFailPanel(myRes, aiRes, cards, aiRes.cards, failReason, checkReward); 
+            if(pass) this.showSettlePanel(true, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, true, "", checkRewardForVisual);
+            else if(this.currentRound < 3) this.showSettlePanel(win, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, false, "", checkRewardForVisual);
+            else this.showFailPanel(myRes, aiRes, cards, aiRes.cards, failReason, checkRewardForVisual); 
         } else {
              if (isEarlyExitLoss) {
                 let earlyFailReason = `胜场不足 (${this.currentLevelWins}/3)`;
-                this.showFailPanel(myRes, aiRes, cards, aiRes.cards, earlyFailReason, checkReward);
+                this.showFailPanel(myRes, aiRes, cards, aiRes.cards, earlyFailReason, checkRewardForVisual);
              } 
              else if (isEarlyExitWin) {
-                this.showSettlePanel(true, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, true, "", checkReward);
+                this.showSettlePanel(true, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, true, "", checkRewardForVisual);
              }
              else if(this.currentRound < 3) {
-                 this.showSettlePanel(win, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, false, "", checkReward);
+                 this.showSettlePanel(win, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, false, "", checkRewardForVisual);
              }
              else if (pass) {
-                 this.showSettlePanel(true, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, true, "", checkReward);
+                 this.showSettlePanel(true, myRes, aiRes, finalPayout, cards, aiRes.cards, baitSrc, aiRes.t, fish, true, "", checkRewardForVisual);
              }
              else {
-                 this.showFailPanel(myRes, aiRes, cards, aiRes.cards, failReason, checkReward);
+                 this.showFailPanel(myRes, aiRes, cards, aiRes.cards, failReason, checkRewardForVisual);
              }
         }
     }
@@ -1231,14 +1428,17 @@ class Game {
         if(win) this.audio.playWin();
         else this.audio.playLose();
 
-        const myTitle = win ? `${myRes.name} 胜` : `${myRes.name}`; const titleCls = win ? "win-title-tag" : "lose-title-tag";
+        const titleCls = win ? "win-title-tag" : "lose-title-tag";
         const getHTML = (cards) => { let h = ''; const allBait =[...this.playerBait, ...this.oppBait]; cards.forEach(c => { const isB = allBait.some(b => b.id === c.id); h += this.htmlCard(c, true, true, !!isB); }); return h; };
         
         const usedBait = mySrc==='mine'?this.playerBait:this.oppBait;
         const baitStr = usedBait.length>0 ? usedBait.map(c=>c.suit+c.rank).join(' ') : '';
         const baitTxt = mySrc==='mine' ? `使用诱饵：我的诱饵牌 ${baitStr}` : (mySrc==='opp' ? `使用诱饵：对手的诱饵牌 ${baitStr}` : '未使用诱饵');
+        
         let fishMultBase = this.equippedPassives.includes('fishhook') ? 3 : 2;
-        const fishTxt = fish ? `<span style="color:var(--highlight)">钓鱼成功x${fishMultBase} + 积分${myRes.payout}</span>` : '无诱饵奖励';
+        let fishBonusText = fishMultBase - 1; 
+        let extraFishBonus = myRes.payout * (fishMultBase - 1);
+        const fishTxt = fish ? `<span style="color:var(--highlight)">钓鱼成功+${fishBonusText} 倍 + 积分${extraFishBonus}</span>` : '无诱饵奖励';
 
         let nextAction = isEnd ? `game.openShopInventory()` : "game.nextRound()"; 
         let btnTxt = isEnd ? "前往道具商店" : "下一回合";
@@ -1247,11 +1447,11 @@ class Game {
 
         let tagsHTML = ''; 
         if(win) { 
-            if(fish) tagsHTML += `<div class="score-tag tag-fish" style="opacity:1; transform:scale(1);">🎣 钓鱼 x${fishMultBase}</div>`; 
+            if(fish) tagsHTML += `<div class="score-tag tag-fish" style="opacity:1; transform:scale(1);">🎣 钓鱼 +${fishBonusText} 倍</div>`; 
             this.equippedPassives.forEach(pId => { 
                 const p = REWARD_POOL.find(x => x.id === pId);
-                if (p && (p.trigger === myRes.name || p.trigger === 'odd' || p.trigger === 'even' || p.trigger === 'face' || (fish && p.trigger === 'fishhook'))) { 
-                   tagsHTML += `<div class="passive-icon" data-desc="${p.name}: ${p.desc}" style="opacity:1; transform:scale(1); margin-right: 5px;">${p.icon}</div>`; 
+                if (p && (myRes.items.includes(p.name) || (fish && p.trigger === 'fishhook'))) { 
+                   tagsHTML += `<div class="passive-icon" data-desc="${p.name}: ${this.getDynamicDesc(pId, 'passive', true)}" style="opacity:1; transform:scale(1); margin-right: 5px;">${p.icon}</div>`; 
                 }
             }); 
         }
@@ -1266,6 +1466,24 @@ class Game {
         
         const progressTxt = progressStr ? `<div style="text-align:right; font-size:12px; color:#fff; margin-top:5px;">本关进度: ${progressStr}</div>` : '';
 
+        let goldBonusHtml = '';
+        if (myRes.bonusGold && myRes.bonusGold > 0) {
+            goldBonusHtml = `
+            <div class="detail-row" style="background:rgba(255,215,0,0.1); color:var(--gold-color);">
+                <span>道具金币奖励</span>
+                <span class="gold-val">金币 +${myRes.bonusGold}</span>
+            </div>`;
+        }
+
+        let betBonusHtml = '';
+        if (win && this.currentBet > 0) {
+            betBonusHtml = `
+            <div class="detail-row" style="background:rgba(255,215,0,0.1); color:var(--gold-color);">
+                <span>下注奖励</span>
+                <span class="gold-val">返还 ${this.currentBet} 金币 / 积分 +${this.currentBet}</span>
+            </div>`;
+        }
+
         ov.innerHTML = `
         <div class="settle-modal">
             <div class="settle-header"><div>${win?'回合胜利':'回合失败'}</div><div class="multiplier-bar" style="font-size:16px;">本局获得：💰 <span id="settle-gold-num">0</span></div></div>
@@ -1273,7 +1491,7 @@ class Game {
                 <div class="settle-left"><div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/bottts/svg?seed=${this.opponentName}')"></div><div class="result-badge">${aiRes.name}</div><div class="cards-display-row">${getHTML(aiCards)}</div><div style="font-size:10px; color:#666;">对手最终牌型</div></div>
                 <div class="settle-right">
                     <div class="${titleCls}" style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                        <span>${myTitle}</span>
+                        <span>${myRes.name}</span>
                         ${progressTxt}
                     </div>
                     <div class="cards-display-row" style="transform:scale(1.1); margin:5px 0;">${getHTML(myCards)}</div>
@@ -1290,6 +1508,8 @@ class Game {
                             <span style="font-size:12px; color:#fff; max-width:50%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${baitTxt}</span>
                             <span>${fishTxt}</span>
                         </div>
+                        ${goldBonusHtml}
+                        ${betBonusHtml}
                     </div>
                     <div class="tags-container" style="flex-wrap:wrap; opacity:1; min-height: 25px;">${tagsHTML}</div>
                 </div>
@@ -1342,9 +1562,11 @@ class Game {
     }
     showFailScreen() { const ov = document.getElementById('overlay-screen'); ov.innerHTML = `<div class="msg-screen-content"><div class="msg-title">挑战失败</div><div class="msg-subtitle">无尽塔楼的试炼还在继续...</div><button class="btn btn-lobby" onclick="game.returnToLobby()">回到大厅</button></div>`; }
     
-    // --- Shop & Inventory Logic (v3.2.2) ---
+    // --- Shop & Inventory Logic (v3.2.7) ---
     openShopInventory() {
-        document.getElementById('overlay-screen').classList.remove('visible'); 
+        const ov = document.getElementById('overlay-screen');
+        ov.innerHTML = '';
+        ov.classList.add('visible'); 
         
         const modal = document.getElementById('shop-screen');
         modal.style.display = 'flex';
@@ -1353,22 +1575,37 @@ class Game {
         this.availablePacks =['upgrade', 'skill', 'normal'];
         this.shopDirectItems = this.generateRandomItems(3);
         
+        if (this.equippedPassives.includes('shali')) {
+            let freeUpgrade = this.generateRandomItems(1, 'upgrade')[0];
+            if (freeUpgrade) {
+                freeUpgrade.price = 0;
+                freeUpgrade.getPrice = () => 0; 
+                this.shopDirectItems.unshift(freeUpgrade); 
+            }
+        }
+        
         this.switchShopTab('shop');
         this.renderEquipCircle();
     }
 
-    generateRandomItems(count) {
+    generateRandomItems(count, forceType = null) {
         const pool =[...REWARD_POOL];
-        const available = pool.filter(i => {
+        let available = pool.filter(i => {
+            if (forceType && i.type !== forceType) return false;
             if (i.unique && (this.ownedSkills.includes(i.ref || i.id) || this.ownedPassives.includes(i.id))) return false;
-            if (i.type === 'upgrade') {
-                if (['yunyan','xuanshu','huance','xinyu'].includes(i.id) && (this.upgradeCounts[i.id]||0) >= 2) return false;
+            if (i.type === 'upgrade' && i.effect !== 'hand_score') {
+                if (['yunyan','xuanshu','huance','xinyu','xunang'].includes(i.id) && (this.upgradeCounts[i.id]||0) >= 2) return false;
                 if (i.id === 'yunyan' && !this.ownedSkills.includes('yundu')) return false;
                 if (i.id === 'xuanshu' && !this.ownedSkills.includes('xuanji')) return false;
                 if (i.id === 'huance' && !this.ownedSkills.includes('huanzhu')) return false;
             }
             return true;
         });
+        
+        if (available.length < count && forceType) {
+             let fallback = pool.filter(i => i.type === forceType);
+             available =[...available, ...fallback, ...fallback, ...fallback];
+        }
         
         this.shuffle(available);
         let res =[];
@@ -1399,83 +1636,102 @@ class Game {
 
     renderShopHome() {
         const ct = document.getElementById('tab-content-shop');
-        let discount = (this.config.floor === 1) ? 0.1 : 1;
+        let discount = 1;
+        if (this.ownedPassives.includes('paomo')) discount *= 0.5;
+        if (this.config.floor === 1) discount *= 0.1;
         
-        let html = '<div style="display:flex; flex-direction:column; overflow-y:auto; height:100%; padding-bottom:20px;">';
+        let html = '<div style="display:flex; flex-direction:column;">';
         
-        // Direct Items 
-        html += `<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start; padding-bottom: 10px;">`;
+        html += `<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start; align-content: flex-start; padding-bottom: 15px;">`;
+        
         if (this.shopDirectItems.length === 0) {
             html += `<div style="text-align:center; width:100%; color:#888; padding: 20px;">暂无道具可购买</div>`;
         } else {
             this.shopDirectItems.forEach(r => {
                 let basePrice = typeof r.getPrice === 'function' ? r.getPrice(this) : r.price;
                 let price = Math.max(1, Math.floor(basePrice * discount));
+                if (r.price === 0 && typeof r.getPrice === 'function' && r.getPrice(this) === 0) price = 0; 
+                
                 const canBuy = this.playerGold >= price;
                 const isPurchased = r._purchased;
                 const btnStyle = isPurchased ? 'btn' : (canBuy ? 'btn-primary' : 'btn');
                 const btnState = (isPurchased || !canBuy) ? 'disabled' : '';
                 
                 let isConsumable = r.type === 'item_active' && r.ref && SKILLS_DB[r.ref] && SKILLS_DB[r.ref].type === 'consumable';
-                const btnTxt = isPurchased ? '已购买' : (isConsumable ? `💰 ${price}/1 次` : `💰 ${price} 购买`);
+                let btnTxt = '';
+                if (isPurchased) btnTxt = '已购买';
+                else if (price === 0) btnTxt = '免费获取';
+                else if (isConsumable) btnTxt = `💰 ${price}/1 次`;
+                else btnTxt = `💰 ${price} 购买`;
                 
-                let discountBadge = discount < 1 ? `<div style="position:absolute; top:4px; right:4px; background:var(--danger); color:#fff; font-size:10px; padding:2px 4px; border-radius:4px; font-weight:bold; z-index:10; box-shadow:0 2px 5px rgba(0,0,0,0.5);">1折出售</div>` : '';
+                let badgeText = '';
+                if (this.ownedPassives.includes('paomo')) badgeText = '五折优惠';
+                else if (this.config.floor === 1) badgeText = '限时1折';
+
+                let discountBadge = (badgeText && price > 0) ? `<div style="position:absolute; top:4px; right:4px; background:var(--danger); color:#fff; font-size:10px; padding:2px 4px; border-radius:4px; font-weight:bold; z-index:10; box-shadow:0 2px 5px rgba(0,0,0,0.5);">${badgeText}</div>` : '';
+
+                let dynDesc = r.desc;
+                if (r.id === 'jiangliu') dynDesc += ` 本回合可得${50 + (this.jiangliuCount || 0) * 50}`;
+                else if (r.id === 'jiaoshi') dynDesc += ` 本回合可得${200 + (this.jiaoshiCount || 0) * 100}`;
 
                 html += `
-                <div class="reward-card" id="rcard-${r._uid}" style="width: calc(33.33% - 10px); min-width: 110px; padding: 10px; height: 190px; ${isPurchased ? 'border: 2px solid var(--gold-color); opacity: 0.6;' : ''}">
+                <div class="reward-card" id="rcard-${r._uid}" style="width: calc(33.33% - 10px); min-width: 110px; max-width: 150px; padding: 10px; height: 190px; justify-content: flex-start; padding-top: 15px; ${isPurchased ? 'border: 2px solid var(--gold-color); opacity: 0.6;' : ''}">
                     ${discountBadge}
                     <div style="font-size:30px; margin-bottom:5px;">${r.icon || '🔰'}</div>
                     <div style="color:var(--highlight); font-weight:bold; margin-bottom:5px; font-size:12px;">${r.name}</div>
-                    <div style="font-size:10px; color:#ccc; margin-bottom:10px; flex:1; display:flex; align-items:center; justify-content:center; line-height:1.4;">${r.desc}</div>
+                    <div style="font-size:10px; color:#ccc; margin-bottom:10px; flex:1; display:flex; align-items:center; justify-content:center; line-height:1.4; text-align:center; white-space:pre-wrap;">${dynDesc}</div>
                     <button class="btn ${btnStyle}" id="buy-btn-${r._uid}" ${btnState} onclick="game.buyShopItem('${r._uid}', ${price})" style="width:100%; padding: 6px 0; font-size: 11px; flex-shrink:0;">${btnTxt}</button>
                 </div>`;
             });
         }
         html += '</div>';
 
-        // Divider
-        html += `<div style="width: 100%; border-top: 1px dashed rgba(255,255,255,0.2); margin: 15px 0;"></div>`;
+        html += `<div style="height: 1px; background: rgba(255,255,255,0.1); width: 100%; margin: 10px 0; flex-shrink: 0;"></div>`;
 
-        // Packs 
         if (this.availablePacks.length > 0) {
-            html += `<div style="display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 10px;">`;
+            html += `<div style="display: flex; justify-content: flex-start; gap: 10px; padding-top: 10px; padding-bottom: 20px; flex-wrap: wrap;">`;
             
             const packDefs = {
-                'upgrade': { icon: '🆙', name: '升级包', desc: '随机1~3张升级卡', color: 'var(--gold-color)' },
-                'skill': { icon: '🔮', name: '技能包', desc: '随机1张技能卡', color: 'var(--rare)' },
-                'normal': { icon: '🎒', name: '道具包', desc: '随机2张普通道具', color: 'var(--highlight)' }
+                'upgrade': { icon: '🆙', name: '升级包', desc: '随机1~3张升级卡', color: 'var(--gold-color)', bg: 'linear-gradient(180deg, rgba(255,215,0,0.15) 0%, rgba(45,55,72,0.9) 100%)' },
+                'skill': { icon: '🔮', name: '技能包', desc: '随机1张技能卡', color: 'var(--rare)', bg: 'linear-gradient(180deg, rgba(213,128,255,0.15) 0%, rgba(45,55,72,0.9) 100%)' },
+                'normal': { icon: '🎒', name: '道具包', desc: '随机2张普通道具', color: 'var(--highlight)', bg: 'linear-gradient(180deg, rgba(0,242,255,0.15) 0%, rgba(45,55,72,0.9) 100%)' }
             };
 
             let packBasePrice = 100;
             let packPrice = Math.max(1, Math.floor(packBasePrice * discount));
-            let packDiscountBadge = discount < 1 ? `<div style="position:absolute; top:-8px; right:-8px; background:var(--danger); color:#fff; font-size:10px; padding:2px 4px; border-radius:6px; font-weight:bold; transform:rotate(15deg); z-index:10; box-shadow:0 2px 5px rgba(0,0,0,0.5);">1折出售</div>` : '';
+            
+            let badgeText = '';
+            if (this.ownedPassives.includes('paomo')) badgeText = '五折优惠';
+            else if (this.config.floor === 1) badgeText = '限时1折';
+            let packDiscountBadge = badgeText ? `<div style="position:absolute; top:4px; right:4px; background:var(--danger); color:#fff; font-size:10px; padding:2px 4px; border-radius:4px; font-weight:bold; z-index:10; box-shadow:0 2px 5px rgba(0,0,0,0.5);">${badgeText}</div>` : '';
 
             this.availablePacks.forEach(p => {
                 const def = packDefs[p];
                 const canAffordPack = this.playerGold >= packPrice;
                 const opac = canAffordPack ? 1 : 0.5;
                 html += `
-                <div class="pack-card" style="padding: 10px; width: calc(33.33% - 10px); max-width: 130px; opacity: ${opac}; display: flex; flex-direction: column; align-items: center; justify-content: center; position:relative;" onclick="game.openPack('${p}', ${packPrice})">
+                <div class="pack-card" style="padding: 10px; width: calc(33.33% - 10px); min-width: 110px; max-width: 150px; height: 150px; justify-content: flex-start; padding-top: 20px; opacity: ${opac}; display: flex; flex-direction: column; align-items: center; position:relative; background: ${def.bg}; border-color: ${def.color};" onclick="game.openPack('${p}', ${packPrice})">
                     ${packDiscountBadge}
-                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--gold-color); color: var(--gold-color); font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-bottom: 5px; white-space: nowrap;">💰 ${packPrice} 开启</div>
+                    <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--gold-color); color: var(--gold-color); font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-bottom: 5px; white-space: nowrap; position: absolute; bottom: 10px;">💰 ${packPrice} 开启</div>
                     <div style="font-size: 30px;">${def.icon}</div>
                     <div style="font-weight: bold; margin-top:5px; font-size:12px; color: ${def.color};">${def.name}</div>
-                    <div style="font-size:9px; color:#888; margin-top:3px;">${def.desc}</div>
+                    <div style="font-size:9px; color:#ddd; margin-top:3px;">${def.desc}</div>
                 </div>`;
             });
             
             html += `</div>`;
         } else {
-            html += `<div style="text-align:center; padding: 15px; color:#666; font-size:12px;">所有卡包已开启</div>`;
+            html += `<div style="text-align:center; padding: 15px; color:#666; font-size:12px; padding-bottom: 30px;">所有卡包已开启</div>`;
         }
 
         html += '</div>';
         ct.innerHTML = html;
+        this.updateShopButtons(); 
     }
 
     openPack(type, price) {
         if (this.playerGold < price) { 
-            alert("金币不足，无法开启卡包！"); 
+            document.getElementById('msg-modal').classList.add('visible');
             return; 
         }
         
@@ -1485,30 +1741,18 @@ class Game {
 
         this.availablePacks = this.availablePacks.filter(p => p !== type);
 
-        const pool =[...REWARD_POOL];
-        const available = pool.filter(i => {
-            if (i.unique && (this.ownedSkills.includes(i.ref || i.id) || this.ownedPassives.includes(i.id))) return false;
-            if (i.type === 'upgrade') {
-                if (['yunyan','xuanshu','huance','xinyu'].includes(i.id) && (this.upgradeCounts[i.id]||0) >= 2) return false;
-                if (i.id === 'yunyan' && !this.ownedSkills.includes('yundu')) return false;
-                if (i.id === 'xuanshu' && !this.ownedSkills.includes('xuanji')) return false;
-                if (i.id === 'huance' && !this.ownedSkills.includes('huanzhu')) return false;
-            }
-            return true;
-        });
-        
         let targetType = '';
         let count = 1;
         if (type === 'upgrade') { targetType = 'upgrade'; count = Math.floor(Math.random()*3)+1; } 
         else if (type === 'skill') { targetType = 'item_active'; count = 1; }
         else if (type === 'normal') { targetType = 'passive'; count = 2; }
         
-        let candidates = available.filter(i => i.type === targetType);
-        this.shuffle(candidates);
+        let newItems = this.generateRandomItems(count, targetType);
         
-        let newItems =[];
-        for(let i=0; i<count; i++) {
-            if(candidates[i]) newItems.push({ ...candidates[i], _purchased: false, _uid: Math.random().toString(36).slice(2) });
+        if (newItems.length === 0) {
+            const t = document.getElementById('toast-msg');
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 3000);
         }
         
         this.shopDirectItems =[...newItems, ...this.shopDirectItems];
@@ -1516,7 +1760,10 @@ class Game {
     }
 
     buyShopItem(uid, price) {
-        if (this.playerGold < price) return;
+        if (this.playerGold < price) {
+            document.getElementById('msg-modal').classList.add('visible');
+            return;
+        }
         
         this.playerGold -= price;
         document.getElementById('shop-modal-gold').innerText = this.playerGold;
@@ -1527,10 +1774,12 @@ class Game {
         r._purchased = true;
 
         if (r.type === 'upgrade') {
-            if(r.id === 'yunyan') { this.skillMaxModifiers.yundu += 1; if(this.skillUsage.yundu!==undefined) this.skillUsage.yundu += 1; this.upgradeCounts.yunyan = (this.upgradeCounts.yunyan||0)+1; }
-            else if(r.id === 'xuanshu') { this.skillMaxModifiers.xuanji += 1; if(this.skillUsage.xuanji!==undefined) this.skillUsage.xuanji += 1; this.upgradeCounts.xuanshu = (this.upgradeCounts.xuanshu||0)+1; }
-            else if(r.id === 'huance') { if(this.betRatios[0] === 0.3) this.betRatios =[0.4, 0.6]; else if(this.betRatios[0] === 0.4) this.betRatios =[0.5, 0.7]; this.upgradeCounts.huance = (this.upgradeCounts.huance||0)+1; }
-            else if(r.id === 'xinyu') { this.maxSkillSlots++; this.upgradeCounts.xinyu = (this.upgradeCounts.xinyu||0)+1; this.renderEquipCircle(); }
+            this.upgradeCounts[r.id] = (this.upgradeCounts[r.id] || 0) + 1;
+            if(r.id === 'yunyan') { this.skillMaxModifiers.yundu += 1; if(this.skillUsage.yundu!==undefined) this.skillUsage.yundu += 1; }
+            else if(r.id === 'xuanshu') { this.skillMaxModifiers.xuanji += 1; if(this.skillUsage.xuanji!==undefined) this.skillUsage.xuanji += 1; }
+            else if(r.id === 'huance') { if(this.betRatios[0] === 0.3) this.betRatios =[0.4, 0.6]; else if(this.betRatios[0] === 0.4) this.betRatios =[0.5, 0.7]; }
+            else if(r.id === 'xinyu') { this.maxSkillSlots++; this.renderEquipCircle(); }
+            else if(r.id === 'xunang') { this.maxPassiveSlots++; this.renderEquipCircle(); }
         } else if (r.type === 'item_active') {
             if (!this.ownedSkills.includes(r.ref)) {
                 this.ownedSkills.unshift(r.ref); 
@@ -1546,10 +1795,14 @@ class Game {
                 this.renderEquipCircle();
             }
         } else {
-            this.ownedPassives.unshift(r.id);
+            if (!this.ownedPassives.includes(r.id)) {
+                this.ownedPassives.unshift(r.id);
+            }
             if (this.equippedPassives.length < this.maxPassiveSlots && !this.equippedPassives.includes(r.id)) {
-                this.equippedPassives.push(r.id);
-                this.renderEquipCircle();
+                if (r.id !== 'paomo') { 
+                    this.equippedPassives.push(r.id);
+                    this.renderEquipCircle();
+                }
             }
         }
 
@@ -1570,16 +1823,21 @@ class Game {
     }
 
     updateShopButtons() {
-        let discount = (this.config.floor === 1) ? 0.1 : 1;
+        let discount = 1;
+        if (this.ownedPassives.includes('paomo')) discount *= 0.5;
+        if (this.config.floor === 1) discount *= 0.1;
+        
         this.shopDirectItems.forEach(item => {
             if(!item._purchased) {
                const btn = document.getElementById('buy-btn-'+item._uid);
                if(btn) {
                    let basePrice = typeof item.getPrice === 'function' ? item.getPrice(this) : item.price;
                    let price = Math.max(1, Math.floor(basePrice * discount));
+                   if(item.price === 0 && typeof item.getPrice === 'function' && item.getPrice(this) === 0) price = 0;
                    if(this.playerGold < price) {
-                       btn.disabled = true;
                        btn.classList.remove('btn-primary');
+                   } else {
+                       btn.classList.add('btn-primary');
                    }
                }
             }
@@ -1588,10 +1846,11 @@ class Game {
 
     renderEquipCircle() {
         const container = document.getElementById('equip-circle-container');
-        let html = '<div id="equip-circle-wrapper" style="position:absolute; width:100%; height:100%; left:0; top:0;">';
+        let html = '';
         
-        const sR = 55; // Inner radius
-        const pR = 130; // Outer radius
+        const isMobile = window.innerWidth <= 768;
+        const sR = isMobile ? 45 : 55; // Inner radius
+        const pR = isMobile ? 100 : 130; // Outer radius
         
         // Background and visual style layers
         html += `<div style="position: absolute; width: ${pR * 2}px; height: ${pR * 2}px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.05); background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); pointer-events: none; left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>`;
@@ -1640,7 +1899,6 @@ class Game {
             html += `<div class="equip-slot ${cls}" style="transform: translate(calc(-50% + ${x}px), calc(-50% + ${y}px));" onclick="game.clickEquipSlot('passive', ${i}, event)">${content}</div>`;
         }
         
-        html += '</div>'; // End wrapper
         container.innerHTML = html;
     }
 
@@ -1715,15 +1973,21 @@ class Game {
         let name = '', desc = '';
         if (type === 'skill') {
             const s = SKILLS_DB[itemId];
-            name = s.name; desc = s.desc;
+            name = s.name; desc = this.getDynamicDesc(itemId, 'skill', true);
         } else {
             const p = REWARD_POOL.find(x => x.id === itemId);
-            name = p.name; desc = p.desc;
+            name = p.name; desc = this.getDynamicDesc(itemId, 'passive', true);
         }
         
         this.showInteractBubble(e.clientX, e.clientY, name, desc, '卸下', () => {
-            if (type === 'skill') this.equippedSkills.splice(index, 1);
-            else this.equippedPassives.splice(index, 1);
+            if (type === 'skill') {
+                this.equippedSkills.splice(index, 1);
+            } else {
+                let unequippedId = this.equippedPassives[index];
+                this.equippedPassives.splice(index, 1);
+                if (unequippedId === 'jiangliu') this.jiangliuCount = 0;
+                if (unequippedId === 'jiaoshi') this.jiaoshiCount = 0;
+            }
             
             this.renderEquipCircle();
             if (document.getElementById('tab-content-inventory').style.display === 'block') {
@@ -1735,11 +1999,13 @@ class Game {
 
     clickInvItem(type, id, e) {
         e.stopPropagation();
+        if (id === 'paomo') return; 
+        
         let name = '', desc = '';
         if (type === 'skill') {
-            const s = SKILLS_DB[id]; name = s.name; desc = s.desc;
+            const s = SKILLS_DB[id]; name = s.name; desc = this.getDynamicDesc(id, 'skill', true);
         } else {
-            const p = REWARD_POOL.find(x => x.id === id); name = p.name; desc = p.desc;
+            const p = REWARD_POOL.find(x => x.id === id); name = p.name; desc = this.getDynamicDesc(id, 'passive', true);
         }
         
         const isEquipped = (type === 'skill' && this.equippedSkills.includes(id)) || 
@@ -1752,7 +2018,12 @@ class Game {
                     if(idx > -1) this.equippedSkills.splice(idx, 1);
                 } else {
                     const idx = this.equippedPassives.indexOf(id);
-                    if(idx > -1) this.equippedPassives.splice(idx, 1);
+                    if(idx > -1) {
+                        let unequippedId = this.equippedPassives[idx];
+                        this.equippedPassives.splice(idx, 1);
+                        if (unequippedId === 'jiangliu') this.jiangliuCount = 0;
+                        if (unequippedId === 'jiaoshi') this.jiaoshiCount = 0;
+                    }
                 }
                 
                 this.renderEquipCircle();
@@ -1801,6 +2072,7 @@ class Game {
     leaveShop() {
         document.getElementById('item-interact-bubble').style.display = 'none';
         document.getElementById('shop-screen').style.display = 'none';
+        document.getElementById('overlay-screen').classList.remove('visible'); 
         this.setOverlayState(false);
         this.levelIndex++; 
         this.showMap(); 
@@ -1822,7 +2094,21 @@ class Game {
     activateSkill(k) { this.skillMode = k; this.selectedCards=[]; this.selectedOppCard = null; this.updateControls(); this.renderScene(); }
     cancelSkill() { this.skillMode=null; this.selectedCards=[]; this.selectedOppCard = null; this.updateControls(); this.renderScene(); }
     
+    consumeSkill(skillId) {
+        if (this.skillUsage[skillId] !== undefined) {
+            this.skillUsage[skillId]--;
+            const s = SKILLS_DB[skillId];
+            if (s && s.type === 'consumable' && this.skillUsage[skillId] <= 0) {
+                this.ownedSkills = this.ownedSkills.filter(sk => sk !== skillId);
+                this.equippedSkills = this.equippedSkills.filter(sk => sk !== skillId);
+                delete this.skillUsage[skillId];
+            }
+        }
+    }
+
     executeSkill() {
+        let skillUsed = this.skillMode;
+        
         const draw = (n) => { const c =[]; 
             if (this.drawPile.length < n) {
                 if(this.discardPile.length > 0) {
@@ -1841,7 +2127,8 @@ class Game {
         if(this.skillMode==='xuanji') {
             const n=this.selectedCards.length; const nc=draw(n); const selIds = this.selectedCards.map(c=>c.id);
             this.playerHand=this.playerHand.filter(x => !selIds.includes(x.id)); for(let c of nc) this.playerHand.push(c); 
-            this.playerHand.sort((a,b)=>b.value-a.value); this.skillUsage.xuanji--;
+            this.playerHand.sort((a,b)=>b.value-a.value); 
+            this.consumeSkill('xuanji');
             
             this.discardPile.push(...this.selectedCards);
             this.selectedCards =[...nc]; 
@@ -1854,17 +2141,13 @@ class Game {
                 const pIdx = this.playerHand.findIndex(c => c.id === m.id); 
                 if(pIdx > -1) { 
                     this.playerHand[pIdx] = t; this.oppHand[r] = m; 
-                    
-                    if (this.config.openHand || this.oppHand.some(c => c.revealed)) {
-                        m.revealed = true;
-                    } else {
-                        m.revealed = false;
-                    }
+                    if (this.config.openHand || this.oppHand.some(c => c.revealed)) m.revealed = true;
+                    else m.revealed = false;
 
                     this.playerHand.sort((a,b)=>b.value-a.value); 
-                    this.skillUsage.yundu--; 
+                    this.consumeSkill('yundu'); 
                     
-                    this.selectedCards =[t];
+                    this.selectedCards = [t];
                     this.renderScene();
                     setTimeout(() => { this.selectedCards =[]; this.renderScene(); }, 2000);
                 } 
@@ -1875,15 +2158,11 @@ class Game {
                 const myIdx = this.playerHand.findIndex(c => c.id === mine.id); const oppIdx = this.oppHand.findIndex(c => c.id === theirs.id); 
                 if (myIdx > -1 && oppIdx > -1) { 
                     this.playerHand[myIdx] = theirs; this.oppHand[oppIdx] = mine; 
-                    
-                    if (this.config.openHand || this.oppHand.some(c => c.revealed)) {
-                        mine.revealed = true;
-                    } else {
-                        mine.revealed = false;
-                    }
+                    if (this.config.openHand || this.oppHand.some(c => c.revealed)) mine.revealed = true;
+                    else mine.revealed = false;
 
                     this.playerHand.sort((a,b)=>b.value-a.value); 
-                    this.skillUsage.blast--; 
+                    this.consumeSkill('blast'); 
 
                     this.selectedCards =[theirs];
                     this.renderScene();
@@ -1892,17 +2171,32 @@ class Game {
             }
         } else if (this.skillMode==='xinjing') {
             if(this.oppBait.length === 0) { const sort =[...this.oppHand].sort((a,b)=>a.value-b.value); this.oppBait = [sort[0], sort[1]]; this.oppHand = sort.slice(2); }
-            this.oppBait.forEach(c => c.revealed = true); this.skillUsage.xinjing--; this.renderScene();
-            this.cancelSkill();
+            this.oppBait.forEach(c => c.revealed = true); 
+            this.consumeSkill('xinjing'); 
+            this.renderScene();
+            this.skillMode = null; 
+            this.selectedOppCard = null;
+            this.updateControls();
+            return;
         } else if (this.skillMode==='abyss') {
-            this.oppHand.forEach(c => c.revealed = true); this.skillUsage.abyss--;
-            this.cancelSkill();
+            this.oppHand.forEach(c => c.revealed = true); 
+            this.consumeSkill('abyss'); 
+            this.renderScene();
+            this.skillMode = null; 
+            this.selectedOppCard = null;
+            this.updateControls();
+            return;
         } else if (this.skillMode==='mirror') {
-            this.playerHand = this.oppHand.map(c => new Card(c.suit, c.rank)); this.skillUsage.mirror--;
-            this.cancelSkill();
+            this.playerHand = this.oppHand.map(c => new Card(c.suit, c.rank)); 
+            this.consumeSkill('mirror'); 
+            this.renderScene();
+            this.skillMode = null; 
+            this.selectedOppCard = null;
+            this.updateControls();
+            return;
         }
         
-        if (['xuanji','yundu','blast', 'xinjing', 'abyss', 'mirror'].includes(this.skillMode)) {
+        if (['xuanji','yundu','blast', 'xinjing', 'abyss', 'mirror'].includes(skillUsed)) {
             if (SKILLS_DB[this.skillMode] && SKILLS_DB[this.skillMode].type === 'consumable') {
                 if (this.skillUsage[this.skillMode] <= 0) {
                     this.ownedSkills = this.ownedSkills.filter(s => s !== this.skillMode);
@@ -1919,7 +2213,14 @@ class Game {
             this.cancelSkill();
         }
     }
-    placeBet(idx) { const p = this.betRatios[idx]; const a=Math.floor(this.playerGold*p); this.playerGold-=a; this.currentBet+=a; this.betUsedThisRound = true; this.cancelSkill(); this.updateHeader(); }
+    
+    placeBet(idx) { 
+        let p = this.betRatios[idx]; 
+        if (this.equippedPassives.includes('xuanwo')) p += 0.1;
+        const a=Math.floor(this.playerGold*p); 
+        this.playerGold-=a; this.currentBet+=a; this.betUsedThisRound = true; this.cancelSkill(); this.updateHeader(); 
+    }
+    
     updateHeader() {
         document.getElementById('level-id').innerText = `FLOOR ${this.config.id}`;
         document.getElementById('gold-display').innerText = this.playerGold;
@@ -1929,7 +2230,7 @@ class Game {
         this.equippedPassives.forEach(pId => { 
             const p = REWARD_POOL.find(x => x.id === pId);
             if(p) {
-                const d = document.createElement('div'); d.className = 'passive-icon'; d.setAttribute('data-desc', `${p.name || ''}: ${p.desc}`); d.innerHTML = p.icon; pl.appendChild(d); 
+                const d = document.createElement('div'); d.className = 'passive-icon'; d.setAttribute('data-desc', `${p.name || ''}: ${this.getDynamicDesc(p.id, 'passive', true)}`); d.innerHTML = p.icon; pl.appendChild(d); 
             }
         });
         
@@ -1953,20 +2254,31 @@ class Game {
         
         const isDefault = !this.inGame; 
 
+        // Apply global upgrades dictionary to evaluate accurate values
+        const upgradeMap = {
+            '单牌': {id: 'fumo', val: 60}, '对子': {id: 'shuangli', val: 60}, '两对': {id: 'jinwei', val: 60},
+            '三条': {id: 'yuezhu', val: 100}, '顺子': {id: 'yousuo', val: 100}, '同花': {id: 'yixi', val: 100},
+            '葫芦': {id: 'cangjiao', val: 100}, '四炸': {id: 'baochao', val: 150}, '同花顺': {id: 'longyuan', val: 200}
+        };
+
         HAND_TYPES_BASE.forEach(t => {
-            let val = t.base; let act = false; let mult = 0;
+            let val = t.base; let act = false;
             
+            if (upgradeMap[t.name] && this.upgradeCounts[upgradeMap[t.name].id]) {
+                val += this.upgradeCounts[upgradeMap[t.name].id] * upgradeMap[t.name].val;
+                act = true;
+            }
+
             if (!isDefault) {
                 this.equippedPassives.forEach(pId=>{ 
                     const p = REWARD_POOL.find(x => x.id === pId);
                     if(p && p.trigger===t.name) { 
                         if (p.val) { val += p.val; act=true; }
-                        if (p.mult) { mult+=p.mult; } 
                     } 
                 });
             }
 
-            ct.innerHTML += `<div class="info-row"><span>${t.name} <span style="font-size:10px; color:#666">(${t.en})</span></span><span style="${act?'color:var(--gold-color)':''}">${val}积分${act?'↑':''}</span><span style="${mult>0?'color:var(--rare)':''}">技能倍数：${mult}</span></div>`;
+            ct.innerHTML += `<div class="info-row"><span>${t.name} <span style="font-size:10px; color:#666">(${t.en})</span></span><span style="${act?'color:var(--gold-color)':''}">${val} 积分${act?'↑':''}</span></div>`;
         });
         sc.classList.add('visible');
     }
